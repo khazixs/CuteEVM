@@ -24,9 +24,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/types"
+	"CuteEVM01/Out/common"
+	"CuteEVM01/Out/core/rawdb"
+	"CuteEVM01/Out/core/types"
 )
 
 // Runs multiple tests with randomized parameters.

@@ -21,13 +21,13 @@ import (
 	"reflect"
 	"testing"
 
+	"CuteEVM01"
+	"CuteEVM01/Out/common"
+	"CuteEVM01/Out/consensus/ethash"
+	"CuteEVM01/Out/core/rawdb"
+	"CuteEVM01/Out/ethdb"
+	"CuteEVM01/Out/params"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/params"
 )
 
 func TestDefaultGenesisBlock(t *testing.T) {

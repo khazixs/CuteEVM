@@ -26,16 +26,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/params"
+	"CuteEVM01"
+	"CuteEVM01/Out/common"
+	"CuteEVM01/Out/consensus"
+	"CuteEVM01/Out/consensus/ethash"
+	"CuteEVM01/Out/core/rawdb"
+	"CuteEVM01/Out/core/state"
+	"CuteEVM01/Out/core/types"
+	"CuteEVM01/Out/crypto"
+	"CuteEVM01/Out/ethdb"
+	"CuteEVM01/Out/params"
 )
 
 // So we can deterministically seed different blockchains
