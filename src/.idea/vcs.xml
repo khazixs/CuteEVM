@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/HashProjectSecp256k1/go-secp256k1" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/github.com/toxeus/go-secp256k1" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/github.com/toxeus/go-secp256k1/c-secp256k1" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/golang.org/x/crypto" vcs="Git" />
+  </component>
+</project>
