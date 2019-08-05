@@ -8,7 +8,7 @@ import (
 )
 
 // StateDB是一个用于完整状态查询的EVM数据库。
-type StateDB interface {
+type 	StateDB interface {
 	CreateAccount(common.Address)
 
 	SubBalance(common.Address, *big.Int)

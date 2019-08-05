@@ -22,9 +22,8 @@ type (
 	// GetHashFunc返回区块链中的第n个块的散列值，并由BLOCKHASH EVM op代码使用。
 	GetHashFunc func(uint64) common.Hash
 )
-
 // run运行给定的合约，并负责使用回退字节码解释器运行预编译。
-func run(evm *EVM, contract *Contract, input []byte, readOnly bool) ([]byte, error) {
+func Run(evm *EVM, contract *Contract, input []byte, readOnly bool) ([]byte, error) {
 	if contract.CodeAddr != nil {
 		precompiles := PrecompiledContractsHomestead
 		if evm.ChainConfig().IsByzantium(evm.BlockNumber) {
@@ -63,11 +62,13 @@ type Context struct {
 	GasPrice *big.Int       // 为GASPRICE提供信息
 
 	// Block 信息
-	Coinbase    common.Address // 为COINBASE提供信息
-	GasLimit    uint64         // 为GASLIMIT提供信息
-	BlockNumber *big.Int       // 为NUMBER提供信息
-	Time        *big.Int       // 为TIME提供信息
-	Difficulty  *big.Int       // 为DIFFICULTY提供信息
+	Coinbase     common.Address // 为COINBASE提供信息
+	GasLimit     uint64         // 为GASLIMIT提供信息
+	BlockNumber  *big.Int       // 为NUMBER提供信息
+	Time         *big.Int       // 为TIME提供信息
+	Difficulty   *big.Int
+	TransferFunc func(StateDB, common.Address, common.Address, *big.Int)
+	// 为DIFFICULTY提供信息
 }
 
 // EVM是Ethereum虚拟机的基本对象，它提供了必要的工具，可以在给定的状态下使用所提供的上下文运行合约。
@@ -175,8 +176,8 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		if precompiles[addr] == nil && evm.ChainConfig().IsEIP158(evm.BlockNumber) && value.Sign() == 0 {
 			// 调用一个不存在的帐户，不做任何事情，但是ping the tracer
 			if evm.vmConfig.Debug && evm.depth == 0 {
-				evm.vmConfig.Tracer.CaptureStart(caller.Address(), addr, false, input, gas, value)
-				evm.vmConfig.Tracer.CaptureEnd(ret, 0, 0, nil)
+				_ = evm.vmConfig.Tracer.CaptureStart(caller.Address(), addr, false, input, gas, value)
+				_ = evm.vmConfig.Tracer.CaptureEnd(ret, 0, 0, nil)
 			}
 			return nil, gas, nil
 		}
@@ -193,13 +194,13 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 
 	// 在调试模式下捕获Tracer启动/结束事件
 	if evm.vmConfig.Debug && evm.depth == 0 {
-		evm.vmConfig.Tracer.CaptureStart(caller.Address(), addr, false, input, gas, value)
+		_ = evm.vmConfig.Tracer.CaptureStart(caller.Address(), addr, false, input, gas, value)
 
 		defer func() { // 参数的延迟计算
-			evm.vmConfig.Tracer.CaptureEnd(ret, gas-contract.Gas, time.Since(start), err)
+			_ = evm.vmConfig.Tracer.CaptureEnd(ret, gas-contract.Gas, time.Since(start), err)
 		}()
 	}
-	ret, err = run(evm, contract, input, false)
+	ret, err = Run(evm, contract, input, false)
 
 	//当EVM返回错误或设置上面的创建代码时，我们将恢复到快照并且消耗掉剩余的任何gas
 	// 此外，当我们处在HomeStead指令集下，这也计算代码存储gas错误。
@@ -238,7 +239,7 @@ func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, 
 	contract := NewContract(caller, to, value, gas)
 	contract.SetCallCode(&addr, evm.StateDB.GetCodeHash(addr), evm.StateDB.GetCode(addr))
 
-	ret, err = run(evm, contract, input, false)
+	ret, err = Run(evm, contract, input, false)
 	if err != nil {
 		evm.StateDB.RevertToSnapshot(snapshot)
 		if err != errExecutionReverted {
@@ -269,7 +270,7 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []by
 	contract := NewContract(caller, to, nil, gas).AsDelegate()
 	contract.SetCallCode(&addr, evm.StateDB.GetCodeHash(addr), evm.StateDB.GetCode(addr))
 
-	ret, err = run(evm, contract, input, false)
+	ret, err = Run(evm, contract, input, false)
 	if err != nil {
 		evm.StateDB.RevertToSnapshot(snapshot)
 		if err != errExecutionReverted {
@@ -306,7 +307,7 @@ func (evm *EVM) StaticCall(caller ContractRef, addr common.Address, input []byte
 
 	//当EVM返回错误或设置上面的创建代码时，我们将恢复到快照并且消耗掉剩余的任何gas
 	// 此外，当我们处在HomeStead指令集下，这也计算代码存储gas错误。
-	ret, err = run(evm, contract, input, true)
+	ret, err = Run(evm, contract, input, true)
 	if err != nil {
 		evm.StateDB.RevertToSnapshot(snapshot)
 		if err != errExecutionReverted {
@@ -361,11 +362,11 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 	}
 
 	if evm.vmConfig.Debug && evm.depth == 0 {
-		evm.vmConfig.Tracer.CaptureStart(caller.Address(), address, true, codeAndHash.code, gas, value)
+		_ = evm.vmConfig.Tracer.CaptureStart(caller.Address(), address, true, codeAndHash.code, gas, value)
 	}
 	start := time.Now()
 
-	ret, err := run(evm, contract, nil, false)
+	ret, err := Run(evm, contract, nil, false)
 
 	// 检查是否超过了最大代码大小
 	maxCodeSizeExceeded := evm.ChainConfig().IsEIP158(evm.BlockNumber) && len(ret) > params.MaxCodeSize

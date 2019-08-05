@@ -19,7 +19,7 @@ package event_test
 import (
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/event"
+	"CuteEVM01/Out/event"
 )
 
 func ExampleFeed_acknowledgedEvents() {

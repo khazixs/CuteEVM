@@ -23,9 +23,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethdb/memorydb"
+	"CuteEVM01/Out/common"
+	"CuteEVM01/Out/crypto"
+	"CuteEVM01/Out/ethdb/memorydb"
 )
 
 func init() {

@@ -28,13 +28,13 @@ import (
 	"testing"
 	"testing/quick"
 
+	"CuteEVM01/Out/common"
+	"CuteEVM01/Out/crypto"
+	"CuteEVM01/Out/ethdb"
+	"CuteEVM01/Out/ethdb/leveldb"
+	"CuteEVM01/Out/ethdb/memorydb"
+	"CuteEVM01/Out/rlp"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/ethdb/leveldb"
-	"github.com/ethereum/go-ethereum/ethdb/memorydb"
-	"github.com/ethereum/go-ethereum/rlp"
 )
 
 func init() {

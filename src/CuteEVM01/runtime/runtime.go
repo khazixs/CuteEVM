@@ -85,14 +85,14 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 	}
 	var (
 		address = common.BytesToAddress([]byte("contract"))
-		vmenv   = NewEnv(cfg)
+		vmEnv   = NewEnv(cfg)
 		sender  = vm.AccountRef(cfg.Origin)
 	)
 	cfg.State.CreateAccount(address)
 	//设置receiver(the executing contract)的执行代码。
 	cfg.State.SetCode(address, code)
 	// 使用给定的配置调用代码
-	ret, _, err := vmenv.Call(
+	ret, _, err := vmEnv.Call(
 		sender,
 		common.BytesToAddress([]byte("contract")),
 		input,
@@ -114,12 +114,12 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 		cfg.State, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()))
 	}
 	var (
-		vmenv  = NewEnv(cfg)
+		vmEnv  = NewEnv(cfg)
 		sender = vm.AccountRef(cfg.Origin)
 	)
 
 	// 使用给定的配置调用代码。
-	code, address, leftOverGas, err := vmenv.Create(
+	code, address, leftOverGas, err := vmEnv.Create(
 		sender,
 		input,
 		cfg.GasLimit,
@@ -134,11 +134,11 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, error) {
 	setDefaults(cfg)
 
-	vmenv := NewEnv(cfg)
+	vmEnv := NewEnv(cfg)
 
 	sender := cfg.State.GetOrNewStateObject(cfg.Origin)
 	// 使用给定的配置调用代码
-	ret, leftOverGas, err := vmenv.Call(
+	ret, leftOverGas, err := vmEnv.Call(
 		sender,
 		address,
 		input,
