@@ -18,7 +18,20 @@ type ChainContext interface {
 	// GetHeader返回与它们的散列对应的散列
 	GetHeader(common.Hash, uint64) *types.Header
 }
+//补充代码~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+type Message interface {
+	From() common.Address
+	//FromFrontier() (common.Address, error)
+	To() *common.Address
 
+	GasPrice() *big.Int
+	Gas() uint64
+	Value() *big.Int
+
+	Nonce() uint64
+	CheckNonce() bool
+	Data() []byte
+}
 // NewEVMContext创建一个用于EVM的新上下文。
 func NewEVMContext(msg Message, header *types.Header, chain ChainContext, author *common.Address) vm.Context {
 	// 如果我们没有显式的作者(即没有挖掘)，从标题中提取
@@ -79,3 +92,4 @@ func Transfer(db vm.StateDB, sender, recipient common.Address, amount *big.Int) 
 	db.SubBalance(sender, amount)
 	db.AddBalance(recipient, amount)
 }
+

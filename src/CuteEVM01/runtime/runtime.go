@@ -1,6 +1,8 @@
 package runtime
 
 import (
+
+	"fmt"
 	"math"
 	"math/big"
 	"time"
@@ -88,6 +90,7 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 		vmEnv   = NewEnv(cfg)
 		sender  = vm.AccountRef(cfg.Origin)
 	)
+	fmt.Println("origin是",cfg.Origin)
 	cfg.State.CreateAccount(address)
 	//设置receiver(the executing contract)的执行代码。
 	cfg.State.SetCode(address, code)
@@ -99,7 +102,8 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 		cfg.GasLimit,
 		cfg.Value,
 	)
-
+	fmt.Println("db是",cfg.State)
+	fmt.Println("value是",cfg.Value)
 	return ret, cfg.State, err
 }
 
@@ -145,6 +149,5 @@ func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, er
 		cfg.GasLimit,
 		cfg.Value,
 	)
-
 	return ret, leftOverGas, err
 }

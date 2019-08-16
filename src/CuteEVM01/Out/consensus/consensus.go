@@ -24,7 +24,6 @@ import (
 	"CuteEVM01/Out/core/state"
 	"CuteEVM01/Out/core/types"
 	"CuteEVM01/Out/params"
-	"CuteEVM01/Out/rpc"
 )
 
 // ChainReader defines a small collection of methods needed to access the local
@@ -48,7 +47,13 @@ type ChainReader interface {
 	// GetBlock retrieves a block from the database by hash and number.
 	GetBlock(hash common.Hash, number uint64) *types.Block
 }
-
+//补充~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+type API struct {
+	Namespace string      // namespace under which the rpc methods of Service are exposed
+	Version   string      // api version for DApp's
+	Service   interface{} // receiver instance which holds the methods
+	Public    bool        // indication if the methods must be considered safe for public use
+}
 // Engine is an algorithm agnostic consensus engine.
 type Engine interface {
 	// Author retrieves the Ethereum address of the account that minted the given
@@ -110,7 +115,7 @@ type Engine interface {
 	CalcDifficulty(chain ChainReader, time uint64, parent *types.Header) *big.Int
 
 	// APIs returns the RPC APIs this consensus engine provides.
-	APIs(chain ChainReader) []rpc.API
+	APIs(chain ChainReader) []API
 
 	// Close terminates any background threads maintained by the consensus engine.
 	Close() error

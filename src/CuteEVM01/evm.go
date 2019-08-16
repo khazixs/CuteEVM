@@ -23,7 +23,7 @@ type (
 	GetHashFunc func(uint64) common.Hash
 )
 // run运行给定的合约，并负责使用回退字节码解释器运行预编译。
-func Run(evm *EVM, contract *Contract, input []byte, readOnly bool) ([]byte, error) {
+func run(evm *EVM, contract *Contract, input []byte, readOnly bool) ([]byte, error) {
 	if contract.CodeAddr != nil {
 		precompiles := PrecompiledContractsHomestead
 		if evm.ChainConfig().IsByzantium(evm.BlockNumber) {
@@ -200,7 +200,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			_ = evm.vmConfig.Tracer.CaptureEnd(ret, gas-contract.Gas, time.Since(start), err)
 		}()
 	}
-	ret, err = Run(evm, contract, input, false)
+	ret, err = run(evm, contract, input, false)
 
 	//当EVM返回错误或设置上面的创建代码时，我们将恢复到快照并且消耗掉剩余的任何gas
 	// 此外，当我们处在HomeStead指令集下，这也计算代码存储gas错误。
@@ -239,7 +239,7 @@ func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, 
 	contract := NewContract(caller, to, value, gas)
 	contract.SetCallCode(&addr, evm.StateDB.GetCodeHash(addr), evm.StateDB.GetCode(addr))
 
-	ret, err = Run(evm, contract, input, false)
+	ret, err = run(evm, contract, input, false)
 	if err != nil {
 		evm.StateDB.RevertToSnapshot(snapshot)
 		if err != errExecutionReverted {
@@ -270,7 +270,7 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []by
 	contract := NewContract(caller, to, nil, gas).AsDelegate()
 	contract.SetCallCode(&addr, evm.StateDB.GetCodeHash(addr), evm.StateDB.GetCode(addr))
 
-	ret, err = Run(evm, contract, input, false)
+	ret, err = run(evm, contract, input, false)
 	if err != nil {
 		evm.StateDB.RevertToSnapshot(snapshot)
 		if err != errExecutionReverted {
@@ -307,7 +307,7 @@ func (evm *EVM) StaticCall(caller ContractRef, addr common.Address, input []byte
 
 	//当EVM返回错误或设置上面的创建代码时，我们将恢复到快照并且消耗掉剩余的任何gas
 	// 此外，当我们处在HomeStead指令集下，这也计算代码存储gas错误。
-	ret, err = Run(evm, contract, input, true)
+	ret, err = run(evm, contract, input, true)
 	if err != nil {
 		evm.StateDB.RevertToSnapshot(snapshot)
 		if err != errExecutionReverted {
@@ -366,7 +366,7 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 	}
 	start := time.Now()
 
-	ret, err := Run(evm, contract, nil, false)
+	ret, err := run(evm, contract, nil, false)
 
 	// 检查是否超过了最大代码大小
 	maxCodeSizeExceeded := evm.ChainConfig().IsEIP158(evm.BlockNumber) && len(ret) > params.MaxCodeSize
@@ -395,7 +395,7 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 		err = errMaxCodeSizeExceeded
 	}
 	if evm.vmConfig.Debug && evm.depth == 0 {
-		evm.vmConfig.Tracer.CaptureEnd(ret, gas-contract.Gas, time.Since(start), err)
+		_ = evm.vmConfig.Tracer.CaptureEnd(ret, gas-contract.Gas, time.Since(start), err)
 	}
 	return ret, address, contract.Gas, err
 
