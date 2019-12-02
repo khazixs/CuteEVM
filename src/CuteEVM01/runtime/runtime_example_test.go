@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"reflect"
 	"testing"
 )
 var (
@@ -14,7 +13,6 @@ var (
 )
 func TestExampleExecute(t *testing.T) {
 	buf, err := ioutil.ReadFile(FileName) //将整个文件的内容读到一个字节切片中。
-	fmt.Println("利用反射得到的文件读取结果类型是",reflect.TypeOf(buf))
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "文件错误: %s\n", err)
 	}else{
